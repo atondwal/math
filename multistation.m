@@ -1,7 +1,9 @@
 (* ::Package:: *)
 
 (* Anish Tondwalkar, NRL *)
-
+(*
+Initial Release on:Tue Aug  2 15:45:31 EDT 2011
+*)
 
 dir= "/home/atondwal/Ionosonde data 2008";
 TIMEDIR="/home/atondwal/Sami Data from Sarah/time/";
@@ -12,6 +14,7 @@ SetOptions[Plot,Frame->True,Axes->False];
 SetOptions[ListPlot,Frame->True,Axes->False,Joined->True,PlotStyle->Hue@.1];
 
 
+(*Reading in the binary data from bin.m*)
 SetDirectory@dir;
 <<("empirical_data"<>ToString@year<>".up")
 <<("samifoF2"<>ToString@year<>".up")
@@ -30,13 +33,16 @@ dropbads:=#&
 (*dropbads[list_]:=Drop[list,{2}]*)
 
 
+(*Throw away the ones not in the interested interval*)
 hmF2C=Cases[#,{t_,h_}/;62<t<107]&/@hmF2;
 foF2C=Cases[#,{t_,h_}/;62<t<107]&/@foF2;
 
-
+(*Takes a function and a (time,val) pair, and finds the (time, difference at time) *)
 diffs[ifunc_,list_]:={#1,ifunc[#1]-#2}&@@@list
+(*Maps (time, diff) to (time,%diff) *)
 diffper[diffdata_]:=Transpose/@Transpose@{Transpose[#][[1]]&/@diffdata ,Transpose[#][[2]]&/@(100diffdata/hmF2)};
 perplots[diffper_]=ListPlot[#,PlotRange->{{62,68},{-100,100}}]&/@diffper;
+(*UTC to localtime*)
 local[list_,lon_]:={#1-lon/(15*24),#2}&@@@list;
 tolocal[diffdatac_]:=local@@@Transpose[dropbads/@{diffdatac,Transpose[stations][[3]]}];
 
@@ -89,6 +95,7 @@ sample[sami_]:=Table[sami[x],{x,62,107,.01}]
 (*ListPlot[InverseFourier[Conjugate/@Fourier[(table=Table[sonde[x],{x,62,107,.01}])-(m1=Median[table])]Fourier[(table=Table[sami[x],{x,62,107,.01}])-(m2=Median[table])]],PlotRange->{{0,100},{-100000,100000}},Joined->False]*)
 
 
+(*smooth, correlate, and find phase/median shifts*)
 f[sami_,sonde_]:=(
 list=InverseFourier[Conjugate/@Fourier[(table=gaussianf@sample@sonde)-(m1=Median[table])]Fourier[(table=sample@sami)-(m2=Median[table])]];
 {Mod[N[Flatten[Position[list,Max[list[[1;;100]]]]][[1]]],100]/100,m1-m2}
@@ -107,6 +114,7 @@ correctionfoF2=f@@@Transpose@{dropbads@IfoF2,foF2I}
 
 
 (* ::Input:: *)
+(*(*Lots of stats on the differences*)*)
 (*Show/@hsmallshows*)
 (*Show/@hbigshows*)
 (*Show/@fsmallshows*)
