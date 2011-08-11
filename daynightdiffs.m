@@ -1,6 +1,5 @@
 (* ::Package:: *)
 
-
 (*Anish Tondwalkar*)
 (*NRL*)
 (*
@@ -8,6 +7,8 @@ Inital Release on: Tue Aug  2 16:10:32 EDT 2011
 This code is based on the statistics found in the input cells of multistation.m
 It plots some of these stats, separated by Day/Night.
 *)
+
+
 
 (* ::Input:: *)
 (*(*Thowaway code*)*)
@@ -40,6 +41,7 @@ ListPlot[distsfoF2[[2]],PlotLabel->"Nighttime \!\(\*SubscriptBox[SubscriptBox[\"
 
 (* ::Input:: *)
 (*ListPointPlot3D[{#1,#2,Abs@#3}&@@@Reverse/@Transpose@Join[{Transpose[correctionhmF2][[2]]},Transpose[dropbads@stations][[3;;4]]]]*)
+
 
 (* ::Input:: *)
 (*Position[hmF2I,_Interpolation]*)

@@ -5,7 +5,7 @@
 Initial Release on:Tue Aug  2 15:45:31 EDT 2011
 *)
 
-dir= "/home/atondwal/Ionosonde data 2008";
+dir= "/home/atondwal/Ionosonde data 2008/bins/";
 TIMEDIR="/home/atondwal/Sami Data from Sarah/time/";
 Dir="/home/atondwal/Sami Data from Sarah/nmf2hmf2-1d/";
 year=2008;
@@ -16,20 +16,21 @@ SetOptions[ListPlot,Frame->True,Axes->False,Joined->True,PlotStyle->Hue@.1];
 
 (*Reading in the binary data from bin.m*)
 SetDirectory@dir;
-<<("empirical_data"<>ToString@year<>".up")
-<<("samifoF2"<>ToString@year<>".up")
-<<("samiNmF2"<>ToString@year<>".up")
-<<("samihmF2"<>ToString@year<>".up")
-<<("times"<>ToString@year<>".up")
-<<("stations"<>ToString@year<>".up")
-
+(*
+<<("empirical_data"<>ToString@year<>".bin")
+<<("samifoF2"<>ToString@year<>".bin")
+<<("samiNmF2"<>ToString@year<>".bin")
+<<("samihmF2"<>ToString@year<>".bin")
+<<("times"<>ToString@year<>".bin")
+<<("stations"<>ToString@year<>".bin")
+*)
 
 (*The data has a lot entries like:*)
 (*	2008-03-03 15:00 5.15 "/" "/"*)
-(*2008-03-03 15:00 3.85 "/" "/"*)
-(*so we'll just throw away the duplicates*)
-(*dropbads[list_]:=Fold[Drop,list,Reverse@{{11},{13},{15},{17}}]*)
-dropbads:=#&
+(*	2008-03-03 15:00 3.85 "/" "/"*)
+(*so we'll just throw away the stations with duplicates*)
+dropbads[list_]:=Fold[Drop,list,Reverse@{{11},{13},{15},{17}}]
+(*dropbads:=#&*)
 (*dropbads[list_]:=Drop[list,{2}]*)
 
 
@@ -39,7 +40,7 @@ foF2C=Cases[#,{t_,h_}/;62<t<107]&/@foF2;
 
 (*Takes a function and a (time,val) pair, and finds the (time, difference at time) *)
 diffs[ifunc_,list_]:={#1,ifunc[#1]-#2}&@@@list
-(*Maps (time, diff) to (time,%diff) *)
+(*Maps (time, diff) to (time,% diff) *)
 diffper[diffdata_]:=Transpose/@Transpose@{Transpose[#][[1]]&/@diffdata ,Transpose[#][[2]]&/@(100diffdata/hmF2)};
 perplots[diffper_]=ListPlot[#,PlotRange->{{62,68},{-100,100}}]&/@diffper;
 (*UTC to localtime*)
@@ -106,11 +107,32 @@ correctionhmF2=f@@@Transpose@{dropbads@IhmF2,hmF2I}
 correctionfoF2=f@@@Transpose@{dropbads@IfoF2,foF2I}
 
 
-(* ::Input:: *)
-(*Show[ListPlot[#1],Plot[#2[x],{x,62,107}, PlotStyle->Red], Plot[#2[x+#3[[1]]]+#3[[2]],{x,62,107}], PlotRange->{{62,68},Automatic}]&@@@ Transpose@{gaussianf/@sample/@dropbads@hmF2I,dropbads@IhmF2,correctionhmF2}*)
-(*Show[ListPlot[#1],Plot[#2[x],{x,62,107}, PlotStyle->Red], Plot[#2[x+#3[[1]]]+#3[[2]],{x,62,107}], PlotRange->{{62,107},Automatic}]&@@@ Transpose@{gaussianf/@sample/@dropbads@hmF2I,dropbads@IhmF2,correctionhmF2}*)
-(*Show[ListPlot[#1],Plot[#2[x],{x,62,107}, PlotStyle->Red], Plot[#2[x+#3[[1]]]+#3[[2]],{x,62,107}], PlotRange->{{62,68},Automatic}]&@@@ Transpose@{gaussianf/@sample/@dropbads@foF2I,dropbads@IfoF2,correctionfoF2}*)
-(*Show[ListPlot[#1],Plot[#2[x],{x,62,107}, PlotStyle->Red], Plot[#2[x+#3[[1]]]+#3[[2]],{x,62,107}], PlotRange->{{62,107},Automatic}]&@@@ Transpose@{gaussianf/@sample/@dropbads@foF2I,dropbads@IfoF2,correctionfoF2}*)
+(*
+/Tranpkbsposef@lliTranspose@{sample[#&]&/@Range[19],f,i}jkbj
+f]f]i, PlotStyle -> OrangejjjjjK1
+*)
+
+
+hs=Show[Plot[#1[x], {x, 62, 107}, PlotStyle -> Orange], 
+   Plot[#2[x], {x, 62, 107}, PlotStyle -> Red], 
+   Plot[#2[x + #3[[1]]] + #3[[2]], {x, 62, 107}], 
+   PlotRange -> {{62, 68}, Automatic}] & @@@ 
+ Transpose@{hmF2I, dropbads@IhmF2, correctionhmF2}
+hf=Show[Plot[#1[x], {x, 62, 107}, PlotStyle -> Orange], 
+   Plot[#2[x], {x, 62, 107}, PlotStyle -> Red], 
+   Plot[#2[x + #3[[1]]] + #3[[2]], {x, 62, 107}], 
+   PlotRange -> {{62, 107}, Automatic}] & @@@ 
+ Transpose@{hmF2I, dropbads@IhmF2, correctionhmF2}
+fs=Show[Plot[#1[x], {x, 62, 107}, PlotStyle -> Orange], 
+   Plot[#2[x], {x, 62, 107}, PlotStyle -> Red], 
+   Plot[#2[x + #3[[1]]] + #3[[2]], {x, 62, 107}], 
+   PlotRange -> {{62, 68}, Automatic}] & @@@ 
+ Transpose@{foF2I, dropbads@IfoF2, correctionfoF2}
+ff=Show[Plot[#1[x], {x, 62, 107}, PlotStyle -> Orange], 
+   Plot[#2[x], {x, 62, 107}, PlotStyle -> Red], 
+   Plot[#2[x + #3[[1]]] + #3[[2]], {x, 62, 107}], 
+   PlotRange -> {{62, 107}, Automatic}] & @@@ 
+ Transpose@{foF2I, dropbads@IfoF2, correctionfoF2}
 
 
 (* ::Input:: *)
@@ -147,4 +169,10 @@ allfoF2[n_]:=Show[ListPlot[
  PlotRange -> {{62, 68}, Automatic}, ImageSize -> 800]
 
 
-allfoF2[1]
+allfoF2[6]
+
+
+
+
+
+

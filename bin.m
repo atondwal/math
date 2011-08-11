@@ -35,6 +35,7 @@ DP1 = Transpose[Position[Dat1= Import[FileName,"Table"],"#>"]][[1]];
 
 
 (* ::Input:: *)
+(*SetDirectory@Dir;*)
 (*DumpSave["empirical_data"<>ToString@year<>".up",{foF2,hmF2}];*)
 
 
@@ -51,7 +52,6 @@ SamifoF2data=(8980.*^-6) Sqrt[SamiNmF2data];
 SamifoF2big=(8980.*^-6) Sqrt[SamiNmF2big];
 
 
-SetDirectory@dir;
 IfoF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamifoF2big}];
 INmF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamiNmF2big}];
 IhmF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamihmF2big}];
