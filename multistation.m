@@ -6,7 +6,8 @@ TIMEDIR="/home/atondwal/Sami Data from Sarah/time/";
 Dir="/home/atondwal/Sami Data from Sarah/nmf2hmf2-1d/";
 year=2008;
 imageSize=600;
-SetOptions[Plot,Frame->True,Axes->False];
+style={Orange,Red,Blue};
+SetOptions[Plot,Frame->True,Axes->False,PlotStyle->style];
 SetOptions[ListPlot,Frame->True,Axes->False,Joined->True,PlotStyle->Hue@.1];
 
 
@@ -112,20 +113,29 @@ f]f]i, PlotStyle -> OrangejjjjjK1
 /Autodwi{1,8}jjjjjK1
 *)
 
-hp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]},
- {x, 62, 107}, PlotStyle -> {Orange,Red,Blue}] & @@@
+
+font="Arial";
+fontSize=12;
+markerSize=12;
+legend[names_, styles_] := (
+ GraphicsGrid[Graphics/@{Text@Style[#1, FontSize -> fontSize, font],
+  {#2, Line[{{-1, 0}, {1, 0}}]}}&@@@Transpose@{names,styles}]
+);
+out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1000],legend[{"Data","SAMI3","Shifted"},style]}}];
+
+
+hp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107}] & @@@
  Transpose@{hmF2I, dropbads@IhmF2, correctionhmF2};
-hs=Show[#,PlotRange->{{62,68},{100,400}}]&/@hp
-hf=Show[#,PlotRange->{{62,107},{100,400}}]&/@hp
-fp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]},
- {x, 62, 107}, PlotStyle -> {Orange,Red,Blue}] & @@@
+hs=Show[#,PlotRange->{{62,68},{100,400}}]&/@hp;
+hf=Show[#,PlotRange->{{62,107},{100,400}}]&/@hp;
+fp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107}] & @@@
  Transpose@{foF2I, dropbads@IfoF2, correctionfoF2};
-fs=Show[#,PlotRange->{{62,68},{1,8}}]&/@fp
-ff=Show[#,PlotRange->{{62,107},{1,8}}]&/@fp
+fs=Show[#,PlotRange->{{62,68},{1,8}}]&/@fp;
+ff=Show[#,PlotRange->{{62,107},{1,8}}]&/@fp;
 
 
-Export["hs.pdf",Grid[Partition[hs,4]]];
-Export["fs.pdf",Grid[Partition[fs,4]]];
+Export["hs.pdf",out[hs]];
+Export["fs.pdf",out[fs]];
 
 
 (*Let's give us some fuctions to show everything for a station*)
