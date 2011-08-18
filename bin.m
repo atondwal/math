@@ -4,12 +4,14 @@
 (*NRL*)
 
 (*
-Finalized: Tue Aug  2 12:20:29 EDT 2011
 This takes data from dir and Dir and writes the important stuff into a 
 mathematica binary file.
 
-foF2 and hmF2 are the empirics
-Ifof2, etc. are the interpolated SAMI data points
+Depends: Ionosonde and sami data
+
+Gives:
+	foF2 and hmF2 are the empirics
+	Ifof2, etc. are the interpolated SAMI data points
 
 *)
 

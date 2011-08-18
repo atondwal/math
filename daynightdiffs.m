@@ -3,7 +3,6 @@
 (*Anish Tondwalkar*)
 (*NRL*)
 (*
-Inital Release on: Tue Aug  2 16:10:32 EDT 2011
 This code is based on the statistics found in the input cells of multistation.m
 It plots some of these stats, separated by Day/Night.
 *)
@@ -19,7 +18,7 @@ It plots some of these stats, separated by Day/Night.
 (*dist=Transpose@{x24[#1],1~Range~24,#2}&@@@paired;*)
 (*ListPointPlot3D[ dist, PlotRange->{{62,107},{0,1},Automatic},FaceGrids->{{0,1,0},{0,-1,0}}]*)
 
-
+(*this takes the statistics from multistation.m and uses it to display mean differenec by hour, by day and night *)
 distfoF2={IntegerPart[#1],If[8<IntegerPart[24FractionalPart[#1]]<17,1,0],#2}&@@@#&/@meansfoF22;
 disthmF2={IntegerPart[#1],If[8<IntegerPart[24FractionalPart[#1]]<17,1,0],#2}&@@@#&/@meanshmF22;
 distsfoF2={#1,#3}&@@@#&/@GatherBy[Join@@distfoF2,#[[2]]&]

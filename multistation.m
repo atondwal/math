@@ -1,6 +1,12 @@
 (* ::Package:: *)
 
 (* Anish Tondwalkar, NRL *)
+(*
+Depends: bin.m
+
+Gives:  Differences, statistics, and correlations
+	And lots of plots.
+*)
 dir= "/home/atondwal/Ionosonde data 2008/bins/";
 TIMEDIR="/home/atondwal/Sami Data from Sarah/time/";
 Dir="/home/atondwal/Sami Data from Sarah/nmf2hmf2-1d/";
@@ -14,6 +20,10 @@ SetOptions[ListPlot,Frame->True,Axes->False,Joined->True,PlotStyle->Hue@.1];
 (*Reading in the binary data from bin.m*)
 SetDirectory@dir;
 (*
+(*Uncomment these lines and change to the binaries output by bin.m
+You shouldn't need to read in the binaries anymore, because bin.m
+now reads in the data more quickly, so it's just as practical to 
+read in all the data at runtime. *)
 <<("empirical_data"<>ToString@year<>".bin")
 <<("samifoF2"<>ToString@year<>".bin")
 <<("samiNmF2"<>ToString@year<>".bin")
@@ -35,7 +45,7 @@ dropbads[list_]:=Fold[Drop,list,Reverse@{{11},{13},{15},{17}}]
 (*dropbads[list_]:=Drop[list,{2}]*)
 
 
-(*Throw away the ones that aren't WHI *)
+(*Throw away the ones that aren't in the WHI *)
 hmF2C=Cases[#,{t_,h_}/;62<t<107]&/@hmF2;
 foF2C=Cases[#,{t_,h_}/;62<t<107]&/@foF2;
 
@@ -44,12 +54,14 @@ foF2C=Cases[#,{t_,h_}/;62<t<107]&/@foF2;
 diffs[ifunc_,list_]:={#1,ifunc[#1]-#2}&@@@list
 (*Maps (time, diff) to (time,% diff) *)
 diffper[diffdata_]:=Transpose/@Transpose@{Transpose[#][[1]]&/@diffdata ,Transpose[#][[2]]&/@(100 diffdata/hmF2)};
+(*plots percentages*)
 perplots[diffper_]=ListPlot[#,PlotRange->{{62,68},{-100,100}}]&/@diffper;
 (*UTC to localtime*)
 local[list_,lon_]:={#1-lon/(15*24),#2}&@@@list;
 tolocal[diffdatac_]:=local@@@Transpose[dropbads/@{diffdatac,Transpose[stations][[3]]}];
 
 
+(*This takes the difference between SAMI's output and the data, and splits in into lists*)
 diffhmF2=diffs@@@Transpose@{dropbads[IhmF2],dropbads[hmF2]};
 difffoF2=diffs@@@Transpose@{dropbads[IfoF2],dropbads[foF2]};
 diffplots=ListPlot[#1,FrameLabel->{"Day of Year","hmF2 (km)",#2[[1]],None},PlotRange->{{62,68},{-300,300}},ImageSize->600]&@@@ 
@@ -64,6 +76,7 @@ Dimensions[diffhmF2dayhr=GatherBy[#,8<IntegerPart[24FractionalPart[#[[1]]]]<17&]
 Dimensions[difffoF2dayhr=GatherBy[#,8<IntegerPart[24FractionalPart[#[[1]]]]<17&]&/@difffoF2day]
 
 
+(*These are the functions that take statistics on the differences*)
 per[stationdata_,function_]:=#[[2]]/function[#[[1]]]&/@stationdata
 applyhmF2[stat_]:=stat[Transpose[#][[2]]]&/@#&/@diffhmF2hr
 applyfoF2[stat_]:=stat[Transpose[#][[2]]]&/@#&/@difffoF2hr
@@ -71,6 +84,12 @@ applyhmF22[stat_]:={#[[1,1]],stat[Transpose[#][[2]]]}&/@#&/@diffhmF2dayhr
 applyfoF22[stat_]:={#[[1,1]],stat[Transpose[#][[2]]]}&/@#&/@difffoF2dayhr
 
 
+(*statistics on the differences are stored in these lists.
+you can plot these using, for example
+    BarChart/@stddevshmF2
+which would show you the standard deviation of the differences between SAMI
+and the ionosonde data for a given station for each hour.
+*)
 {meanshmF2,nshmF2,medianshmF2,stddevshmF2}=applyhmF2/@{Mean,Length,Median,StandardDeviation};
 {meansfoF2,nsfoF2,mediansfoF2,stddevsfoF2}=applyfoF2/@{Mean,Length,Median,StandardDeviation};
 {meanshmF22,nshmF22,medianshmF22,stddevshmF22}=applyhmF22/@{Mean,Length,Median,StandardDeviation};
@@ -91,6 +110,7 @@ sample[sami_]:=Table[sami[x],{x,62,107,.01}]
 
 
 (* ::Input:: *)
+(*debug code*)
 (*ListPlot@Abs@Fourier@Table[hmF2I[[20]][x],{x,62,107,.01}] *)
 (*sami=IhmF2[[3]];sonde=hmF2I[[3]];*)
 (*ListPlot[InverseFourier[Conjugate/@Fourier[(table=Table[sonde[x],{x,62,107,.01}])-(m1=Median[table])]Fourier[(table=Table[sami[x],{x,62,107,.01}])-(m2=Median[table])]],PlotRange->{{0,100},{-100000,100000}},Joined->False]*)
@@ -114,16 +134,18 @@ f]f]i, PlotStyle -> OrangejjjjjK1
 *)
 
 
+(*This addes legends to prepare list of plots for output*)
 font="Arial";
 fontSize=12;
 markerSize=12;
 legend[names_, styles_] := (
  GraphicsGrid[Graphics/@{Text@Style[#1, FontSize -> fontSize, font],
-  {#2, Line[{{-1, 0}, {1, 0}}]}}&@@@Transpose@{names,styles}]
+  Flatten[{#2, Line[{{-1, 0}, {1, 0}}]}]}&@@@Transpose@{names,styles}]
 );
 out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1000],legend[{"Data","SAMI3","Shifted"},style]}}];
 
 
+(*Generates the plots that I put in my talk, 16 per slide*)
 hp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107}] & @@@
  Transpose@{hmF2I, dropbads@IhmF2, correctionhmF2};
 hs=Show[#,PlotRange->{{62,68},{100,400}}]&/@hp;
@@ -134,8 +156,9 @@ fs=Show[#,PlotRange->{{62,68},{1,8}}]&/@fp;
 ff=Show[#,PlotRange->{{62,107},{1,8}}]&/@fp;
 
 
-Export["hs.pdf",out[hs]];
-Export["fs.pdf",out[fs]];
+(*Writes out the plots of the data*)
+Export["hs.pdf",out[Fold[Drop,hs,{{1},{-1},{-4}}]]];
+Export["fs.pdf",out[Fold[Drop,fs,{{1},{-1},{-4}}]]];
 
 
 (*Let's give us some fuctions to show everything for a station*)
@@ -159,7 +182,7 @@ allfoF2[n_]:=Show[ListPlot[
  PlotRange -> {{62, 68}, Automatic}, ImageSize -> 800]
 
 
-(*::Input::*)
+(* ::Input:: *)
 (*allfoF2[6]*)
 
 

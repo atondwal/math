@@ -6,6 +6,8 @@
 Inital Release on: Tue Aug  2 15:57:09 EDT 2011
 This code reads in data from a run of SAMI2 and compares it to the binary data
 output from bin.m
+Depends: bin.m
+Gives: plots with SAMI2/3 for the first day of WHI
 *)
 
 
@@ -19,6 +21,7 @@ output from bin.m
 (*dir="C:\\Users\\Anish\\Desktop\\sami\\"*)
 
 
+dir="/home/atondwal/sami2-1.00/"
 SetDirectory@dir;
 
 
@@ -67,6 +70,7 @@ SetDirectory@dir;
 
 (*
 3yy3P:.,.+3s/T\+/&T/g
+/BARplots:s/Blue/Black/
 *)
 
 
@@ -87,6 +91,8 @@ f}i,PlotStyle->Red j OHf}i,PlotStyle->Blue jjjj OFhi,ImageSize->700jjj
 yypiT
 yyp:s/T\+[^r]/T&/g
 yyp:s/T\+\([^r]\)/BAR\1/g
+yf,f,pbbhh
+/Plokbkbkb Plot[K4hhi,PlotStyle@.kbkb->Hue@.,kb7qkb
 *)
 plots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]}]&/@Transpose[sami2hmf2u];
 Oplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Red]&/@Transpose[sami2hmf2O];
@@ -95,8 +101,8 @@ TTplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->
 TTTplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2hmf2TTT];
 TTTTplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2hmf2TTTT];
 TTTTTplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2hmf2TTTTT];
-BARplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2hmf2BAR];
-Show[
+BARplots=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Black]&/@Transpose[sami2hmf2BAR];
+hm=Show[
  plots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  Oplots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  Tplots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
@@ -105,9 +111,9 @@ Show[
  TTTTplots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  TTTTTplots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  BARplots[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
- Plot[dropbads[IhmF2][[n]][x], {x, 62, 107}], 
+ Plot[dropbads[IhmF2][[n]][x], {x, 62, 107},PlotStyle->Hue@.9], 
  ListPlot[dropbads[hmF2][[n]],Joined->False,PlotStyle->Red], 
- PlotRange -> {{62, 63}, {100, 400}}, 
+ PlotRange -> {{62, 63}, {100, 400}},  FrameLabel->{"Day","Peak Height (km)"},
  ImageSize->700]
 
 
@@ -118,8 +124,8 @@ TTplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/
 TTTplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2nmf2TTT];
 TTTTplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2nmf2TTTT];
 TTTTTplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2nmf2TTTTT];
-BARplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2nmf2BAR];
-Show[
+BARplotsn=ListPlot[Reverse/@Transpose@{Sqrt@# 8980*^-6,Range[62,63-2./24/4,1./24/4]},PlotStyle->Black]&/@Transpose[sami2nmf2BAR];
+fo=Show[
   plotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
   Oplotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
   Tplotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
@@ -128,9 +134,9 @@ Show[
   TTTTplotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
   TTTTTplotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
   BARplotsn[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
-   Plot[dropbads[IfoF2][[n]][x], {x, 62, 107}], 
+   Plot[dropbads[IfoF2][[n]][x], {x, 62, 107},PlotStyle->Hue@.9], 
  ListPlot[dropbads[foF2][[n]],Joined->False,PlotStyle->Red], 
-PlotRange -> {{62, 63}, Automatic}, 
+PlotRange -> {{62, 63}, Automatic},  FrameLabel->{"Day","Peak Freq (MHz)"},
   ImageSize->700]
 
 
@@ -141,8 +147,8 @@ TTplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyl
 TTTplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2tecTTT];
 TTTTplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2tecTTTT];
 TTTTTplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2tecTTTTT];
-BARplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Blue]&/@Transpose[sami2tecBAR];
-Show[
+BARplotstec=ListPlot[Reverse/@Transpose@{#,Range[62,63-2./24/4,1./24/4]},PlotStyle->Black]&/@Transpose[sami2tecBAR];
+te=Show[
  plotstec[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  Oplotstec[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
  Tplotstec[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
@@ -153,10 +159,13 @@ Show[
  BARplotstec[[Ceiling[(dropbads[stations][[n,3]]+51.31454) 100/113]]],
    rel=Take[Drop[Convert,61 12-3],All,{Floor[dropbads[stations][[n,4]]]},{Floor[dropbads[stations][[n,3]]]}];
  ListPlot[Transpose@{Range[62,62+(Length[rel]-1)/12,1/12] ,Flatten@rel},PlotStyle->Red],
- Plot[dropbads[ITEC][[n]][x], {x, 62, 107}], 
- PlotRange -> {{62, 63}, Automatic}, 
+ Plot[dropbads[ITEC][[n]][x], {x, 62, 107},PlotStyle->Hue@.9], 
+ PlotRange -> {{62, 63}, Automatic},  FrameLabel->{"Day","TEC"},
  ImageSize->700]
 
+
+out[hs_]:=Grid[{{hs,legend[{"Data","N","O",".9T",".8T",".7T",".6T",".5T","OT","S3"},{{Red,Dotted},Green,Red,Blue,Blue,Blue,Blue,Blue,Black,Hue@.9}]}}];
+out/@{fo,hm,te}
 
 (* ::Input:: *)
 (*plots[[#]]&/@Range[50,100]*)

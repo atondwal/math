@@ -1,15 +1,12 @@
 (* ::Package:: *)
 
-(* ::Input:: *)
-(*BarChart/@stddevsfoF2*)
 
-
-(* ::Input:: *)
-(*BarChart/@meansfoF2*)
-
-
-(* ::Input:: *)
-(*dropbads@stations*)
+(* Anish Tondwalkar, NRL *)
+(*
+slabs.m
+This file depends on multistation.m; run that first.
+This should plots of the slab heights.
+*)
 
 
 (* ::Input:: *)
