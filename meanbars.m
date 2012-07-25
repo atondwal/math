@@ -2,7 +2,6 @@
 
 (* Anish Tondwalkar, NRL *)
 (*
-Initial Release on:Tue Aug  2 15:45:31 EDT 2011
 This code shows some of the statistics from multistation.m with labels.
 *)
 

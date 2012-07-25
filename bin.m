@@ -16,24 +16,30 @@ Gives:
 *)
 
 
-dir= "/home/atondwal/Ionosonde data 2008";
-Dir="/home/atondwal/sami/";
-table="Data.csv";
+dir= "C:\\Users\\Anish\\iono2008";
+Dir="C:\\Users\\Anish\\sami";
+$RecursionLimit=Infinity;
+table="data.csv";
 lbound =25;
 ubound =60;
 year=2008;
 SetDirectory@dir;
 stations =Cases[Import@table, 
-    {num_,code_,name_,lat_,lon_,mLat_,mLong_,date_,metadata_,_,_,_,_,_,_,_,_,"y",_,_}:>
+    {num_,code_,name_,lat_,lon_,mLat_,mLong_,date_,metadata_,_,_,_,_,_,_,_,_,"y",_,_,_}:>
     {name,code, mLat,lon}/;lbound<Abs[mLat]<ubound]; 
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".txt.dated.new"
 fhDATA[FileName_]:=(
 DP1 = Transpose[Position[Dat1= Import[FileName,"Table"],"#>"]][[1]];
 {Take[Dat1,Take[DP1,{2,3}]+{2,-1}] , Take[Dat1,Take[DP1,{-3,-2}]+{2,-1}]}
 )
+unbad[x_]:=If[Dimensions[x][[1]]<2,x,{x[[1]]}~Join~unbad[x[[If[x[[2,1]]==x[[1,1]],3,2];;-1]]]]
 
 
-{foF2,hmF2}={#[[1]]+(#[[2]]/24.)+(#[[3]]/1440.),#[[4]]}&/@#&/@#&/@Transpose[fhDATA/@fname/@stations];
+(*This commented line writes the sanzitized data as Mathematica ASCII*)
+(*Put[#,#2]&@@@Transpose[{Transpose[{foF2,hmF2}],StringSplit[#,"."][[1]]<>".sanitized"&/@fname/@stations}];*)
+(*Reads the sanitized ASCII*)
+(*{foF2,hmF2}=Transpose[Import/@(StringSplit[#,"."][[1]]<>".sanitized"&/@fname/@stations)]*)
+{foF2,hmF2}=unbad/@#&/@({#[[1]]+(#[[2]]/24.)+(#[[3]]/1440.),#[[4]]}&/@#&/@#&/@Transpose[fhDATA/@fname/@stations]);
 
 
 (* ::Input:: *)
@@ -54,10 +60,10 @@ SamifoF2data=(8980.*^-6) Sqrt[SamiNmF2data];
 SamifoF2big=(8980.*^-6) Sqrt[SamiNmF2big];
 
 
-IfoF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamifoF2big}];
-INmF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamiNmF2big}];
-IhmF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamihmF2big}];
-ITEC=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamiTECbig}];
+IfoF2=Interpolation[unbad[Transpose[#]]]&/@Transpose[{uttimebig,SamifoF2big}];
+INmF2=Interpolation[unbad[Transpose[#]]]&/@Transpose[{uttimebig,SamiNmF2big}];
+IhmF2=Interpolation[unbad[Transpose[#]]]&/@Transpose[{uttimebig,SamihmF2big}];
+ITEC=Interpolation[unbad[Transpose[#]]]&/@Transpose[{uttimebig,SamiTECbig}];
 
 
 (* ::Input:: *)
@@ -73,3 +79,5 @@ ITEC=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamiTECbig}];
 
 (* ::Input:: *)
 (*DumpSave["stations"<>ToString@year<>".up",stations];*)
+(*DumpSave["rawhmF2"<>ToString@year<>".up",SamihmF2big];*)
+(*DumpSave["rawfoF2"<>ToString@year<>".up",SamifoF2big];*)

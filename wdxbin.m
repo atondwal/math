@@ -4,13 +4,12 @@
 (*NRL*)
 
 (*
-Finalized: Tue Aug  2 12:20:29 EDT 2011
 This takes data from dir and Dir and writes the important stuff into a 
-mathematica binary file.
+mathematica binary file. It differs from bin.m in that the data is 
+portable within different mathematica workstations.
 
 foF2 and hmF2 are the empirics
 Ifof2, etc. are the interpolated SAMI data points
-
 *)
 
 
@@ -22,7 +21,7 @@ ubound =60;
 year=2008;
 SetDirectory@dir;
 stations =Cases[Import@table, 
-    {num_,code_,name_,lat_,lon_,mLat_,mLong_,date_,metadata_,_,_,_,_,_,_,_,_,"y",_,_}:>
+    {num_,code_,name_,lat_,lon_,mLat_,mLong_,date_,metadata_,_,_,_,_,_,_,_,_,"y",_,_,_}:>
     {name,code, mLat,lon}/;lbound<Abs[mLat]<ubound]; 
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".txt.dated.new"
 fhDATA[FileName_]:=(

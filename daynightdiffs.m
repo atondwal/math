@@ -3,7 +3,7 @@
 (*Anish Tondwalkar*)
 (*NRL*)
 (*
-This code is based on the statistics found in the input cells of multistation.m
+This code is based on the statistics found in multistation.m
 It plots some of these stats, separated by Day/Night.
 *)
 
