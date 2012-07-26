@@ -1,18 +1,19 @@
 (* ::Package:: *)
 
-year="2008"
-runname="whi_12a"
+year="2004"
+runname="run_2004_4"
+stylefor2={Red,Blue}
 Suffix=runname<>".png"
 Suffix2=runname<>".CSV"
-SetDirectory@TIMEDIR
+SetDirectory@dir
 out2[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","SAMI3"},stylefor2]}}];
 SetOptions[ListPlot,ImageSize->400,BaseStyle->{FontFamily->"Ariel",Bold,FontSize->12}];
-Export["hmF2Short_"<>Suffix,out2[Fold[Drop,hs2,{{1},{-1},{-4}}]]]
-Export["hmF2Full_"<>Suffix,out2[Fold[Drop,hf2,{{1},{-1},{-4}}]]]
-Export["foF2Short_"<>Suffix,out2[Fold[Drop,fs2,{{1},{-1},{-4}}]]]
-Export["foF2Full_"<>Suffix,out2[Fold[Drop,ff2,{{1},{-1},{-4}}]]]
-Export["NmF2Short_"<>Suffix,out2[Fold[Drop,Ns2,{{1},{-1},{-4}}]]]
-Export["NmF2Full_"<>Suffix,out2[Fold[Drop,Nf2,{{1},{-1},{-4}}]]]
+Export["hmF2Short_"<>Suffix,out2[hs2]]
+Export["hmF2Full_"<>Suffix,out2[hf2]]
+Export["foF2Short_"<>Suffix,out2[fs2]]
+Export["foF2Full_"<>Suffix,out2[ff2]]
+Export["NmF2Short_"<>Suffix,out2[Ns2]]
+Export["NmF2Full_"<>Suffix,out2[Nf2]]
 For [i=1,i<19,i++,
 Export["StationfoF2"<>ToString[i]<>Suffix,allfoF2[i]]];
 For [i=1,i<19,i++,
@@ -68,3 +69,6 @@ Export["hmF2_byDOY_Daytime"<>Suffix2,distshmF2[[1]]]
 Export["hmF2_byDOY_Nighttime"<>Suffix2,distshmF2[[2]]]
 Export["NmF2_byDOY_Daytime"<>Suffix2,distsNmF2per[[1]]]
 Export["NmF2_byDOY_Nighttime"<>Suffix2,distsNmF2per[[2]]]
+
+
+
