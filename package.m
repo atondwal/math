@@ -15,6 +15,7 @@ fhDATA=Get;
 (*Reads the sanitized ASCII*)
 (*{foF2,hmF2}=Transpose[Import/@(StringSplit[#,"."][[1]]<>".sanitized"&/@fname/@stations)]*)
 {foF2,hmF2}=Transpose[fhDATA/@fname/@stations];
+NmF2=Transpose[{Transpose[#][[1]],(Transpose[#][[2]] 10^6/8980.)^2}]&/@foF2
 
 
 (* ::Input:: *)
@@ -89,9 +90,11 @@ read in all the data at runtime.
 
 
 (*Throw away the ones that aren't in the WHI *)
-hmF2C=Cases[#,{t_,h_}/;62<t<107]&/@hmF2;
-foF2C=Cases[#,{t_,h_}/;62<t<107]&/@foF2;
-NmF2C=Cases[#,{t_,h_}/;62<t<107]&/@NmF2;
+(*casefn=Cases[#,{t_,h_}/;62<t<107]&*)
+casefn=Identity;
+hmF2C=casefn/@hmF2;
+foF2C=casefn/@foF2;
+NmF2C=casefn/@NmF2;
 
 
 (*Takes a function and a (time,val) pair, and finds the (time, difference at time) *)
@@ -105,7 +108,7 @@ perplots[diffper_]=ListPlot[#,PlotRange->{{62,68},{-100,100}}]&/@diffper;
 (*UTC to localtime*)
 *)
 local[list_,lon_]:={#1-lon/(15*24),#2}&@@@list;
-tolocal[diffdatac_]:=local@@@Transpose[dropbads/@{diffdatac,Transpose[stations][[3]]}];
+tolocal[diffdatac_]:=local@@@Transpose[{diffdatac,Transpose[stations][[3]]}];
 
 
 (*This takes the difference between SAMI's output and the data, and splits in into lists*)
@@ -176,7 +179,7 @@ NmF2I=Interpolation/@norm/@NmF2;
 
 
 gaussianf[data_]:=GaussianFilter[data,5]
-sample[sami_]:=Table[sami[x],{x,62,107,.01}]
+sample[sami_]:=Table[sami[x],{x,1,365,.01}]
 
 
 (* ::Input:: *)
@@ -266,7 +269,7 @@ allhmF2[n_]:=Show[ListPlot[
  ListPlot[Transpose@{sample[#&],#}&@gaussianf@sample@hmF2I[[n]],PlotStyle->{Orange,Thick}],
  Plot[Identity[IhmF2][[n]][x + correctionhmF2[[n]][[1]]] + 
    correctionhmF2[[n]][[2]], {x, 62, 107}, PlotStyle -> {Hue@.8,Thick}], 
- PlotRange -> {{62, 68}, {100, 400}}, ImageSize -> 800, FrameLabel->{"Day of Year","hmF2 (km)",stationname[[n]]}]*)
+ PlotRange -> {{62, 68}, {100, 400}}, ImageSize -> 800, FrameLabel->{"Day of Year","hmF2 (km)",stationname[[n]]}]
 allfoF2[n_]:=Show[ListPlot[
   Transpose[Identity[Transpose[{uttimebig, SamifoF2big}]][[n]]], 
   PlotStyle -> Hue@.2, Joined -> False], 
