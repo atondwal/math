@@ -8,6 +8,8 @@ $RecursionLimit=Infinity;
 SetDirectory@dir;
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".sanitized"
 fhDATA=Get;
+Attributes[Table]={HoldFirst,Protected};
+Attributes[Plot]={HoldFirst,Protected};
 
 
 (*This commented line writes the sanzitized data as Mathematica ASCII*)
@@ -28,10 +30,13 @@ f[station_,DOY_]:={
 Import["hmf2-1d_"<>ToString@year<>(DOYString=IntegerString[DOY,10,3])<>"_"<>station[[2]]<>".dat"],
 Import["nmf2-1d_"<>ToString@year<>DOYString<>"_"<>station[[2]]<>".dat"],
 If[tec,Import["tec-1d_"<>ToString@year<>DOYString<>"_"<>station[[2]]<>".dat"],],
-(DOY+(#[[2]]+(#[[3]]+#[[4]]/60)/60)/24)&/@Import["time_"<>ToString@year<>DOYString<>".dat","Table"]
+(DOY+(#2+(#3+#4/60)/60)/24)&@@@Import["time_"<>ToString@year<>DOYString<>".dat","Table"]
 }
-Dimensions[{SamihmF2data,SamiNmF2data,SamiTECdata,uttimedata}=Transpose[ f@@#&/@ Tuples[{stations,Range[62,107]} ]]]
-Dimensions[{uttimebig,SamifoF2big,SamihmF2big,SamiTECbig,SamiNmF2big}=Join@@@#&/@(Partition[#,46]&/@(Flatten/@#&/@{uttimedata,SamifoF2data,SamihmF2data,SamiTECdata,SamiNmF2data}))]
+Dimensions[{SamihmF2data,SamiNmF2data,SamiTECdata,uttimedata}=Transpose[ f@@@Tuples[{stations,Range@@days}] ]]
+Dimensions[{uttimebig,SamifoF2big,SamihmF2big,SamiTECbig,SamiNmF2big}=
+					Apply[Join,Map[Partition[#,days[[2]]-days[[1]]+1]&,
+						Flatten/@#&/@{uttimedata,SamifoF2data,SamihmF2data,SamiTECdata,SamiNmF2data}
+					],{2}]]
 SamifoF2data=(8980.*^-6) Sqrt[SamiNmF2data];
 SamifoF2big=(8980.*^-6) Sqrt[SamiNmF2big];
 
@@ -90,11 +95,11 @@ read in all the data at runtime.
 
 
 (*Throw away the ones that aren't in the WHI *)
-(*casefn=Cases[#,{t_,h_}/;62<t<107]&*)
+(*casefn=Cases[#,{t_,h_}/;62<t<107]&/@#&*)
 casefn=Identity;
-hmF2C=casefn/@hmF2;
-foF2C=casefn/@foF2;
-NmF2C=casefn/@NmF2;
+hmF2C=casefn@hmF2;
+foF2C=casefn@foF2;
+NmF2C=casefn@NmF2;
 
 
 (*Takes a function and a (time,val) pair, and finds the (time, difference at time) *)
@@ -179,14 +184,14 @@ NmF2I=Interpolation/@norm/@NmF2;
 
 
 gaussianf[data_]:=GaussianFilter[data,5]
-sample[sami_]:=Table[sami[x],{x,1,365,.01}]
+sample[sami_]:=Table[sami[x],{x}~Join~{.01}]
 
 
 (* ::Input:: *)
 (*debug code*)
-(*ListPlot@Abs@Fourier@Table[hmF2I[[20]][x],{x,62,107,.01}] *)
+(*ListPlot@Abs@Fourier@Table[hmF2I[[20]][x],{x,1, 365,.01}] *)
 (*sami=IhmF2[[3]];sonde=hmF2I[[3]];*)
-(*ListPlot[InverseFourier[Conjugate/@Fourier[(table=Table[sonde[x],{x,62,107,.01}])-(m1=Median[table])]Fourier[(table=Table[sami[x],{x,62,107,.01}])-(m2=Median[table])]],PlotRange->{{0,100},{-100000,100000}},Joined->False]*)
+(*ListPlot[InverseFourier[Conjugate/@Fourier[(table=Table[sonde[x],{x,1, 365,.01}])-(m1=Median[table])]Fourier[(table=Table[sami[x],{x,1, 365,.01}])-(m2=Median[table])]],PlotRange->{{0,100},{-100000,100000}},Joined->False]*)
 
 
 (*smooth, correlate, and find phase/median shifts*)
@@ -196,14 +201,21 @@ list=InverseFourier[Conjugate/@Fourier[(table=gaussianf@sample@sonde)-(m1=Median
 )
 
 
+(*
 correctionhmF2=f@@@Transpose@{IhmF2,hmF2I}
 correctionfoF2=f@@@Transpose@{IfoF2,foF2I}
+correctionNmF2=f@@@Transpose@{INmF2,NmF2I}
+*)
 
+correctionNmF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
+correctionfoF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
+correctionhmF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
 
 (*
 /Tranpkbsposef@lliTranspose@{sample[#&]&/@Range[19],f,i}jkbj
 f]f]i, PlotStyle -> OrangejjjjjK1
 /Autodwi{1,8}jjjjjK1
+f3hhli(*%li*)f3hhhhi(*ll%li*)jj
 *)
 
 
@@ -223,34 +235,34 @@ out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","S
 (*Generates the plots that I put in my talk, 16 per slide*)
 {stationname,sid,slat,slong}=Transpose[stations];
 
-hp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107},PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
+hp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x}~Join~days,PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
  Transpose@{hmF2I, IhmF2, correctionhmF2, stationname};
-fp=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107},PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
+fp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x}~Join~days,PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
  Transpose@{foF2I, IfoF2, correctionfoF2, stationname};
-Np=Plot[{#1[x],#2[x],#2[x + #3[[1]]] + #3[[2]]}, {x, 62, 107},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
+Np=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x}~Join~days,Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
  Transpose@{NmF2I, INmF2, correctionNmF2, stationname};
 
-hp2=Plot[{#1[x],#2[x]}, {x, 62, 107},PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
+hp2=Plot[{#1[x],#2[x]}, {x}~Join~days,PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
  Transpose@{hmF2I, IhmF2, stationname};
-fp2=Plot[{#1[x],#2[x]}, {x, 62, 107},PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
+fp2=Plot[{#1[x],#2[x]}, {x}~Join~days,PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
  Transpose@{foF2I, IfoF2, stationname};
-Np2=Plot[{#1[x],#2[x]}, {x, 62, 107},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
+Np2=Plot[{#1[x],#2[x]}, {x}~Join~days,Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
  Transpose@{NmF2I, INmF2, stationname};
 
 fs=Show[#,PlotRange->{{62,68},{1,10}}]&/@fp;
-ff=Show[#,PlotRange->{{62,107},{1,10}}]&/@fp;
+ff=Show[#,PlotRange->{days,{1,10}}]&/@fp;
 hs=Show[#,PlotRange->{{62,68},{150,450}}]&/@hp;
-hf=Show[#,PlotRange->{{62,107},{150,450}}]&/@hp;
+hf=Show[#,PlotRange->{days,{150,450}}]&/@hp;
 Ns=Show[#,PlotRange->{{62,68},{10^4,10^6}}]&/@Np;
-Nf=Show[#,PlotRange->{{62,107},{10^4,10^6}}]&/@Np;
+Nf=Show[#,PlotRange->{days,{10^4,10^6}}]&/@Np;
 fs2=Show[#,PlotRange->{{62,68},{1,10}}]&/@fp2;
-ff2=Show[#,PlotRange->{{62,107},{1,10}}]&/@fp2;
+ff2=Show[#,PlotRange->{days,{1,10}}]&/@fp2;
 hs2=Show[#,PlotRange->{{62,68},{150,450}}]&/@hp2;
-hf2=Show[#,PlotRange->{{62,107},{150,450}}]&/@hp2;
+hf2=Show[#,PlotRange->{days,{150,450}}]&/@hp2;
 Ns2=Show[#,PlotRange->{{62,68},{10^4,10^6}}]&/@Np2;
-Nf2=Show[#,PlotRange->{{62,107},{10^4,10^6}}]&/@Np2;
+Nf2=Show[#,PlotRange->{days,{10^4,10^6}}]&/@Np2;
 
 
 (*
@@ -264,11 +276,11 @@ Export["fs.pdf",out[Fold[Drop,fs,{{1},{-1},{-4}}]]];
 allhmF2[n_]:=Show[ListPlot[
   Transpose[Identity[Transpose[{uttimebig, SamihmF2big}]][[n]]], 
   PlotStyle -> Hue@.2, Joined -> False], 
- Plot[Identity[IhmF2][[n]][x], {x, 62, 107}], 
+ Plot[Identity[IhmF2][[n]][x], {x}~Join~days], 
  ListPlot[Identity[hmF2][[n]],Joined -> False,PlotStyle -> Red], 
  ListPlot[Transpose@{sample[#&],#}&@gaussianf@sample@hmF2I[[n]],PlotStyle->{Orange,Thick}],
  Plot[Identity[IhmF2][[n]][x + correctionhmF2[[n]][[1]]] + 
-   correctionhmF2[[n]][[2]], {x, 62, 107}, PlotStyle -> {Hue@.8,Thick}], 
+   correctionhmF2[[n]][[2]], {x}~Join~days, PlotStyle -> {Hue@.8,Thick}], 
  PlotRange -> {{62, 68}, {100, 400}}, ImageSize -> 800, FrameLabel->{"Day of Year","hmF2 (km)",stationname[[n]]}]
 allfoF2[n_]:=Show[ListPlot[
   Transpose[Identity[Transpose[{uttimebig, SamifoF2big}]][[n]]], 
@@ -277,7 +289,7 @@ allfoF2[n_]:=Show[ListPlot[
  ListPlot[Identity[foF2][[n]],Joined -> False,PlotStyle -> Red], 
  ListPlot[Transpose@{sample[#&],#}&@gaussianf@sample@foF2I[[n]],PlotStyle->{Orange,Thick}],
  Plot[Identity[IfoF2][[n]][x + correctionfoF2[[n]][[1]]] + 
-   correctionfoF2[[n]][[2]], {x, 62, 107}, PlotStyle -> {Hue@.8,Thick}], 
+   correctionfoF2[[n]][[2]], {x}~Join~days, PlotStyle -> {Hue@.8,Thick}], 
  PlotRange -> {{62, 68}, Automatic}, ImageSize -> 800]
 
 
