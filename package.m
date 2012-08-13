@@ -94,7 +94,7 @@ read in all the data at runtime.
 
 (*Throw away the ones that aren't in the WHI *)
 (*casefn=Cases[#,{t_,h_}/;62<t<107]&/@#&*)
-casefn=#&;
+casefn=Transpose@MapAt[MedianFilter[#,5]&,Transpose@#,2]&/@#&;
 hmF2C=casefn@hmF2;
 foF2C=casefn@foF2;
 NmF2C=casefn@NmF2;
@@ -237,7 +237,7 @@ out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","S
 
 hp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
  Transpose@{hmF2I, IhmF2, correctionhmF2, stationname};
-fp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
+fp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
  Transpose@{foF2I, IfoF2, correctionfoF2, stationname};
 Np=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
@@ -245,7 +245,7 @@ RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
 
 hp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
  Transpose@{hmF2I, IhmF2, stationname};
-fp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
+fp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
  Transpose@{foF2I, IfoF2, stationname};
 Np2=Plot[{#1[x],#2[x]}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
@@ -317,6 +317,9 @@ ListPlot[distsNmF2[[2]],Joined->False,PlotLabel->"Nighttime NmF2",FrameLabel->{"
 *)
 ListPlot[distsNmF2per[[1]],Joined->False,PlotLabel->"Daytime NmF2",FrameLabel->{"Day of 2008","Difference in Density (%)"}]
 ListPlot[distsNmF2per[[2]],Joined->False,PlotLabel->"Nighttime NmF2",FrameLabel->{"Day of 2008","Difference in Density (%)"}]
+
+
+
 
 
 
