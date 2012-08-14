@@ -94,10 +94,10 @@ read in all the data at runtime.
 
 (*Throw away the ones that aren't in the WHI *)
 (*casefn=Cases[#,{t_,h_}/;62<t<107]&/@#&*)
-casefn=Transpose@MapAt[MedianFilter[#,5]&,Transpose@#,2]&/@#&;
-hmF2C=casefn@hmF2;
-foF2C=casefn@foF2;
-NmF2C=casefn@NmF2;
+casefn=Transpose@MapAt[GaussianFilter[MedianFilter[#,5],5]&,Transpose@#,2]&;
+hmF2C=casefn/@hmF2;
+foF2C=casefn/@foF2;
+NmF2C=casefn/@NmF2;
 
 
 (*Takes a function and a (time,val) pair, and finds the (time, difference at time) *)
@@ -172,10 +172,11 @@ and the ionosonde data for a given station for each hour.
 
 
 (*This function throws out outliers*)
-norm[list_]:=(
+(*norm[list_]:=
 stats={Abs@Median[vals=Transpose[list][[2]]],3 StandardDeviation@vals};
 Cases[list,{t_,x_}/;stats[[1]]-x <= stats[[2]]]
-)
+*)
+norm=casefn
 hmF2I=Interpolation/@norm/@hmF2; 
 foF2I=Interpolation/@norm/@foF2; 
 NmF2I=Interpolation/@norm/@NmF2;

@@ -2,11 +2,11 @@
 
 year="2004"
 runname="run_2004_4"
-stylefor2={Blue,Red}
+stylefor2={Red,Blue}
 Suffix=runname<>".pdf"
 Suffix2=runname<>".CSV"
 SetDirectory@dir
-out2[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"SAMI3","Data"},stylefor2]}}];
+out2[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","SAMI3"},stylefor2]}}];
 SetOptions[ListPlot,ImageSize->400,BaseStyle->{FontFamily->"Ariel",Bold,FontSize->12}];
 Export["hmF2Short_"<>Suffix,out2[hs2]]
 Export["hmF2Full_"<>Suffix,out2[hf2]]
