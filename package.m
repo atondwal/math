@@ -210,16 +210,6 @@ correctionNmF2=Table[{0,0},{i,Length[stations]}]
 correctionfoF2=Table[{0,0},{i,Length[stations]}]
 correctionhmF2=Table[{0,0},{i,Length[stations]}]
 
-(*
-/Tranp\[CapitalAHat]\[Euro]kbspose
-f@lliTranspose@{sample[#&]&/@Range[19],\[RawEscape]f,i}j\[CapitalAHat]\[Euro]kb \[RawEscape]j
-f]f]i, PlotStyle -> Orange \[RawEscape]jjjjj\[CapitalAHat]\[Euro]K1
-/Auto
-dwi {1,8}\[RawEscape]jjjjj\[CapitalAHat]\[Euro]K1
-f3hhli(*\[RawEscape] % li*)\[RawEscape]f3hhhhi(*\[RawEscape]ll % li*)\[RawEscape]jj
-*)
-
-
 (*This addes legends to prepare list of plots for output*)
 font="Arial";
 fontSize=12;
