@@ -9,7 +9,7 @@ SetDirectory@dir;
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".sanitized"
 fhDATA=Cases[#,{a_,b_}/;b<900&&0<a<366]&/@Get[#]&;
 Attributes[Table]={HoldFirst,Protected};
-Attributes[Plot]={HoldFirst,Protected};
+Attributes[Plot]={Protected};
 
 
 (*This commented line writes the sanzitized data as Mathematica ASCII*)
@@ -185,7 +185,7 @@ NmF2I=Interpolation/@norm/@NmF2;
 
 
 gaussianf[data_]:=GaussianFilter[data,5]
-sample[sami_]:=Table[sami[x],{x}~Join~{.01}]
+sample[sami_]:=Table[sami[x],{x}~Join~days~Join~{.01}]
 
 
 (* ::Input:: *)
