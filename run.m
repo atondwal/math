@@ -3,6 +3,8 @@
 dir= "C:\\Users\\Anish\\iono2008";
 Dir="C:\\Users\\Anish\\run_2004_4";
 year=2004;
+(*spring, summer, fall, winter*)
+seasonnum=2;
 
 SetDirectory@dir;
 table="data.csv";
@@ -21,9 +23,6 @@ SetOptions[ListPlot,Frame->True,Axes->False,Joined->True,PlotStyle->Hue@.1];
 
 
 <<"C:\\Users\\Anish\\math\\package.m"
-
-
-
 
 
 

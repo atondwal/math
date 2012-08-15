@@ -6,8 +6,13 @@
 
 $RecursionLimit=Infinity;
 SetDirectory@dir;
+
+<<"C:\\Users\\Anish\\math\\seasons.m"
+season=seasons[[seasonnum]];
+sign=Sign[Subtract@@season];
+
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".sanitized"
-fhDATA=Cases[#,{a_,b_}/;b<900&&0<a<366]&/@Get[#]&;
+fhDATA=Cases[#,{a_,b_}/;b<900&&Xor[season[[1]]<a<season[[2]],sign==1]]&/@Get[#]&
 
 
 (*This commented line writes the sanzitized data as Mathematica ASCII*)
