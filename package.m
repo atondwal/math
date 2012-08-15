@@ -236,15 +236,16 @@ RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
  Transpose@{NmF2I, INmF2, correctionNmF2, stationname};
 *)
 
-hp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
+hpn[f_]:=Plot[f@{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
  Transpose@{hmF2I, IhmF2, stationname};
-fp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
+fpn[f_]:=Plot[f@{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","foF2 (MHz)",#3}] & @@@
  Transpose@{foF2I, IfoF2, stationname};
-Np2=Plot[{#1[x],#2[x]}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
+Npn[f_]:=Plot[f@{#1[x],#2[x]}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
  Transpose@{NmF2I, INmF2, stationname};
 
-{hp,fp,Np}= {hp2,fp2,Np2};
+{hp2,fp2,Np2}=#[#&]&/@{hpn,fpn,Npn};
+{hp,fp,Np}={hp2,fp2,Np2};
 
 fs=Show[#,PlotRange->{{62,68},{1,13}}]&/@fp;
 ff=Show[#,PlotRange->{{1, 365},{1,13}}]&/@fp;
