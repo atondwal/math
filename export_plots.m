@@ -17,6 +17,12 @@ fulls[Suffix_]:=(
 	Export["foF2Full_"<>Suffix,out2[ff2]]
 	Export["NmF2Short_"<>Suffix,out2[Ns2]]
 	Export["NmF2Full_"<>Suffix,out2[Nf2]]
+	Export["RhmF2Short_"<>Suffix,out2[hs3]]
+	Export["RhmF2Full_"<>Suffix,out2[hf3]]
+	Export["RfoF2Short_"<>Suffix,out2[fs3]]
+	Export["RfoF2Full_"<>Suffix,out2[ff3]]
+	Export["RNmF2Short_"<>Suffix,out2[Ns3]]
+	Export["RNmF2Full_"<>Suffix,out2[Nf3]]
 	For [i=1,i<19,i++,
 	Export["StationfoF2"<>ToString[i]<>Suffix,allfoF2[i]]];
 	For [i=1,i<19,i++,

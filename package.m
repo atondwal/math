@@ -254,6 +254,7 @@ RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
  Transpose@{NmF2I, INmF2, stationname};
 
 {hp2,fp2,Np2}=#[#&]&/@{hpn,fpn,Npn};
+{hp3,fp3,Np3}=#[Reverse]&/@{hpn,fpn,Npn};
 {hp,fp,Np}={hp2,fp2,Np2};
 
 fs=Show[#,PlotRange->{{62,68},{1,10}}]&/@fp;
@@ -268,6 +269,12 @@ hs2=Show[#,PlotRange->{{62,68},{150,450}}]&/@hp2;
 hf2=Show[#,PlotRange->{days,{150,450}}]&/@hp2;
 Ns2=Show[#,PlotRange->{{62,68},{10^4,10^6}}]&/@Np2;
 Nf2=Show[#,PlotRange->{days,{10^4,10^6}}]&/@Np2;
+fs3=Show[#,PlotRange->{{62,68},{1,10}}]&/@fp3;
+ff3=Show[#,PlotRange->{days,{1,10}}]&/@fp3;
+hs3=Show[#,PlotRange->{{62,68},{150,450}}]&/@hp3;
+hf3=Show[#,PlotRange->{days,{150,450}}]&/@hp3;
+Ns3=Show[#,PlotRange->{{62,68},{10^4,10^6}}]&/@Np3;
+Nf3=Show[#,PlotRange->{days,{10^4,10^6}}]&/@Np3;
 
 
 (*
