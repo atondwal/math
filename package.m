@@ -226,13 +226,15 @@ out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","S
 (*Generates the plots that I put in my talk, 16 per slide*)
 {stationname,sid,slat,slong}=Transpose[stations];
 
-hp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
+(*
+hp=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x, 1, 365},PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
  Transpose@{hmF2I, IhmF2, correctionhmF2, stationname};
-fp=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
+fp=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
  Transpose@{foF2I, IfoF2, correctionfoF2, stationname};
-Np=Plot[{#1[x],#2[x],#2[x (*#3[[1]]*)] (*+ #3[[2]]*)}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
+Np=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
  Transpose@{NmF2I, INmF2, correctionNmF2, stationname};
+*)
 
 hp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
  Transpose@{hmF2I, IhmF2, stationname};
@@ -241,6 +243,8 @@ fp2=Plot[{#1[x],#2[x]}, {x, 1, 365},PlotRange->{All,{1,15}},Axes->False,Frame->T
 Np2=Plot[{#1[x],#2[x]}, {x, 1, 365},Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
 RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
  Transpose@{NmF2I, INmF2, stationname};
+
+{hp,fp,Np}= {hp2,fp2,Np2};
 
 fs=Show[#,PlotRange->{{62,68},{1,13}}]&/@fp;
 ff=Show[#,PlotRange->{{1, 365},{1,13}}]&/@fp;
