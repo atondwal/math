@@ -13,6 +13,8 @@ sign=Sign[Subtract@@season];
 
 fname[Station_]:=ToString[year]<>"/"<>Station[[2]]<>"_"<>ToString[year]<>".sanitized"
 fhDATA=Cases[#,{a_,b_}/;b<900&&Xor[season[[1]]<a<season[[2]],sign==1]]&/@Get[#]&
+Attributes[Table]={HoldFirst,Protected};
+Attributes[Plot]={Protected};
 
 
 (*This commented line writes the sanzitized data as Mathematica ASCII*)
