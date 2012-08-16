@@ -14,15 +14,8 @@ Attributes[Plot]={Protected};
 
 (*This commented line writes the sanzitized data as Mathematica ASCII*)
 (*Put[#,#2]&@@@Transpose[{Transpose[{foF2,hmF2}],StringSplit[#,"."][[1]]<>".sanitized"&/@fname/@stations}];*)
-(*Reads the sanitized ASCII*)
-(*{foF2,hmF2}=Transpose[Import/@(StringSplit[#,"."][[1]]<>".sanitized"&/@fname/@stations)]*)
 {foF2,hmF2}=Transpose[fhDATA/@fname/@stations];
 NmF2=Transpose[{Transpose[#][[1]],(Transpose[#][[2]] 10^6/8980.)^2}]&/@foF2;
-
-
-(* ::Input:: *)
-(*SetDirectory@Dir;*)
-(*DumpSave["empirical_data"<>ToString@year<>".up",{foF2,hmF2}];*)
 
 
 SetDirectory@Dir;
@@ -47,55 +40,10 @@ IhmF2=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamihmF2big}];
 ITEC=Interpolation[Transpose[#]]&/@Transpose[{uttimebig,SamiTECbig}];
 
 
-(* ::Input:: *)
-(*DumpSave["samifoF2"<>ToString@year<>".up",IfoF2];*)
-(*DumpSave["samiNmF2"<>ToString@year<>".up",INmF2];*)
-(*DumpSave["samihmF2"<>ToString@year<>".up",IhmF2];*)
-(*DumpSave["samiTEC"<>ToString@year<>".up",ITEC];*)
-
-
-(* ::Input:: *)
-(*DumpSave["times"<>ToString@year<>".up",uttimebig];*)
-
-
-(* ::Input:: *)
-(*DumpSave["stations"<>ToString@year<>".up",stations];*)
-(*DumpSave["rawhmF2"<>ToString@year<>".up",SamihmF2big];*)
-(*DumpSave["rawfoF2"<>ToString@year<>".up",SamifoF2big];*)
-
-
 (*Reading in the binary data from bin.m*)
 SetDirectory@Dir;
 
-(*Uncomment these lines and change to the binaries output by bin.m
-You shouldn't need to read in the binaries anymore, because bin.m
-now reads in the data more quickly, so it's just as practical to 
-read in all the data at runtime. 
-<<("empirical_data"<>ToString@year<>".up")
-<<("samifoF2"<>ToString@year<>".up")
-<<("samiNmF2"<>ToString@year<>".up")
-<<("samihmF2"<>ToString@year<>".up")
-<<("times"<>ToString@year<>".up")
-<<("stations"<>ToString@year<>".up")
-<<("rawhmF2"<>ToString@year<>".up")
-<<("rawfoF2"<>ToString@year<>".up")
-*)
-
-
-(*The data has a lot entries like:*)
-(*	2008-03-03 15:00 5.15 "/" "/"*)
-(*	2008-03-03 15:00 3.85 "/" "/"*)
-(*so we'll just throw away the stations with duplicates*)
-(*midlat*)
-(*dropbads[list_]:=Fold[Drop,list,Reverse@{{11},{13},{15},{17}}]*)
-(*no bads*)
-(*dropbads:=#&*)
-(*equatorial*)
-(*dropbads[list_]:=Drop[list,{2}]*)
-
-
-(*Throw away the ones that aren't in the WHI *)
-(*casefn=Cases[#,{t_,h_}/;62<t<107]&/@#&*)
+(*Clean up the data; It's rather noisy*)
 casefn=Transpose@MapAt[GaussianFilter[MedianFilter[#,5],5]&,Transpose@#,2]&;
 hmF2C=casefn/@hmF2;
 foF2C=casefn/@foF2;
@@ -106,26 +54,11 @@ NmF2C=casefn/@NmF2;
 diffs[ifunc_,list_]:={#1,ifunc[#1]-#2}&@@@list
 (*Maps (time, diff) to (time,% diff) *)
 diffsper[ifunc_,list_]:={#1,100*(ifunc[#1]-#2)/#2}&@@@list
-(* Not used or working
-diffper[diffdata_]:=Transpose/@Transpose@{Transpose[#][[1]]&/@diffdata ,Transpose[#][[2]]&/@(100 diffdata/hmF2)};
-(*plots percentages*)
-perplots[diffper_]=ListPlot[#,PlotRange->{{62,68},{-100,100}}]&/@diffper;
-(*UTC to localtime*)
-*)
 local[list_,lon_]:={#1-lon/(15*24),#2}&@@@list;
 tolocal[diffdatac_]:=local@@@Transpose[{diffdatac,Transpose[stations][[3]]}];
 
 
 (*This takes the difference between SAMI's output and the data, and splits in into lists*)
-(*bad but not used*)
-(*
-diffhmF2=diffs@@@Transpose@{dropbads[IhmF2],dropbads[hmF2]};
-difffoF2=diffs@@@Transpose@{dropbads[IfoF2],dropbads[foF2]};
-diffNmF2=diffs@@@Transpose@{dropbads[INmF2],dropbads[NmF2]};
-diffNmF2per=diffsper@@@Transpose@{dropbads[INmF2],dropbads[NmF2]};
-diffplots=ListPlot[#1,FrameLabel->{"Day of Year","hmF2 (km)",#2[[1]],None},PlotRange->{{62,68},{-300,300}},ImageSize->600]&@@@ 
- Transpose@{diffhmF2~Join~difffoF2,stations};
-*)
 diffhmF2c=diffs@@@Transpose@{IhmF2,hmF2C};
 difffoF2c=diffs@@@Transpose@{IfoF2,foF2C};
 diffNmF2c=diffs@@@Transpose@{INmF2,NmF2C};
@@ -174,10 +107,6 @@ and the ionosonde data for a given station for each hour.
 
 
 (*This function throws out outliers*)
-(*norm[list_]:=
-stats={Abs@Median[vals=Transpose[list][[2]]],3 StandardDeviation@vals};
-Cases[list,{t_,x_}/;stats[[1]]-x <= stats[[2]]]
-*)
 norm=casefn
 hmF2I=Interpolation/@norm/@hmF2; 
 foF2I=Interpolation/@norm/@foF2; 
@@ -188,13 +117,6 @@ gaussianf[data_]:=GaussianFilter[data,5]
 sample[sami_]:=Table[sami[x],{x}~Join~days~Join~{.01}]
 
 
-(* ::Input:: *)
-(*debug code*)
-(*ListPlot@Abs@Fourier@Table[hmF2I[[20]][x],{x,1, 365,.01}] *)
-(*sami=IhmF2[[3]];sonde=hmF2I[[3]];*)
-(*ListPlot[InverseFourier[Conjugate/@Fourier[(table=Table[sonde[x],{x,1, 365,.01}])-(m1=Median[table])]Fourier[(table=Table[sami[x],{x,1, 365,.01}])-(m2=Median[table])]],PlotRange->{{0,100},{-100000,100000}},Joined->False]*)
-
-
 (*smooth, correlate, and find phase/median shifts*)
 f[sami_,sonde_]:=(
 list=InverseFourier[Conjugate/@Fourier[(table=gaussianf@sample@sonde)-(m1=Median[table])]Fourier[(table=sample@sami)-(m2=Median[table])]];
@@ -202,6 +124,7 @@ list=InverseFourier[Conjugate/@Fourier[(table=gaussianf@sample@sonde)-(m1=Median
 )
 
 
+(*Unused, because it takes too long to run*)
 (*
 correctionhmF2=f@@@Transpose@{IhmF2,hmF2I}
 correctionfoF2=f@@@Transpose@{IfoF2,foF2I}
@@ -212,12 +135,6 @@ correctionNmF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
 correctionfoF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
 correctionhmF2=Table[{0,0},{thisVarIsNotUsed,Length[stations]}]
 
-(*
-/Tranpkbsposef@lliTranspose@{sample[#&]&/@Range[19],f,i}jkbj
-f]f]i, PlotStyle -> OrangejjjjjK1
-/Autodwi{1,8}jjjjjK1
-f3hhli(*%li*)f3hhhhi(*ll%li*)jj
-*)
 
 (*This adds legends to prepare list of plots for output*)
 font="Arial";
@@ -227,23 +144,11 @@ legend[names_, styles_] := (
  GraphicsGrid[Graphics/@{Text@Style[#1, FontSize -> fontSize, font],
   Flatten[{#2, Line[{{-1, 0}, {1, 0}}]}]}&@@@Transpose@{names,styles}]
 );
-(*Moved to export section
-out[hs_]:=Grid[{{GraphicsGrid[Partition[hs,4],ImageSize->1200],legend[{"Data","SAMI3","Shifted"},style]}}];
-*)
 
 
 (*Generates the plots that I put in my talk, 16 per slide*)
 {stationname,sid,slat,slong}=Transpose[stations];
 
-(*
-hp=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x}~Join~days,PlotRange->{All,{150,450}},Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","hmF2 (km)",#4}] & @@@
- Transpose@{hmF2I, IhmF2, correctionhmF2, stationname};
-fp=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x}~Join~days,PlotRange->{All,{1,10}},Axes->False,Frame->True,PlotStyle->style, FrameLabel->{"Day of Year","foF2 (MHz)",#4}] & @@@
- Transpose@{foF2I, IfoF2, correctionfoF2, stationname};
-Np=Plot[{#1[x],#2[x],#2[x #3[[1]]] + #3[[2]]}, {x}~Join~days,Axes->False,Frame->True,PlotStyle->style,FrameLabel->{"Day of Year","NmF2 (\!\(\*SuperscriptBox[\"cm\", 
-RowBox[{\"-\", \"3\"}]]\))",#4}] & @@@
- Transpose@{NmF2I, INmF2, correctionNmF2, stationname};
-*)
 
 hpn[f_]:=Plot[f@{#1[x],#2[x]}, {x}~Join~days,PlotRange->{All,{150,450}}, Axes->False,Frame->True,PlotStyle->stylefor2,FrameLabel->{"Day of Year","hmF2 (km)",#3}] & @@@
  Transpose@{hmF2I, IhmF2, stationname};
@@ -256,6 +161,7 @@ RowBox[{\"-\", \"3\"}]]\))",#3}] & @@@
 {hp2,fp2,Np2}=#[#&]&/@{hpn,fpn,Npn};
 {hp3,fp3,Np3}=#[Reverse]&/@{hpn,fpn,Npn};
 {hp,fp,Np}={hp2,fp2,Np2};
+
 
 fs=Show[#,PlotRange->{{62,68},{1,10}}]&/@fp;
 ff=Show[#,PlotRange->{days,{1,10}}]&/@fp;
@@ -275,13 +181,6 @@ hs3=Show[#,PlotRange->{{62,68},{150,450}}]&/@hp3;
 hf3=Show[#,PlotRange->{days,{150,450}}]&/@hp3;
 Ns3=Show[#,PlotRange->{{62,68},{10^4,10^6}}]&/@Np3;
 Nf3=Show[#,PlotRange->{days,{10^4,10^6}}]&/@Np3;
-
-
-(*
-(*Writes out the plots of the data*)
-Export["hs.pdf",out[Fold[Drop,hs,{{1},{-1},{-4}}]]];
-Export["fs.pdf",out[Fold[Drop,fs,{{1},{-1},{-4}}]]];
-*)
 
 
 (*Let's give us some fuctions to show everything for a station*)
@@ -318,15 +217,6 @@ distsfoF2={#1,#3}&@@@#&/@GatherBy[Join@@distfoF2,#[[2]]&];
 distshmF2={#1,#3}&@@@#&/@GatherBy[Join@@disthmF2,#[[2]]&];
 distsNmF2={#1,#3}&@@@#&/@GatherBy[Join@@distNmF2,#[[2]]&];
 distsNmF2per={#1,#3}&@@@#&/@GatherBy[Join@@distNmF2per,#[[2]]&];
-(*
-SetOptions[ListPlot,ImageSize->400,BaseStyle->{FontFamily->"Ariel",Bold,FontSize->12}];
-ListPlot[distshmF2[[1]],Joined->False,PlotLabel->"Daytime hmF2",FrameLabel->{"Day of 2008","Difference in Altitude (km)"}]
-ListPlot[distshmF2[[2]],Joined->False,PlotLabel->"Nighttime hmF2",FrameLabel->{"Day of 2008","Difference in Altitude (km)"}]
-ListPlot[distsfoF2[[1]],Joined->False,PlotLabel->"Daytime foF2",FrameLabel->{"Day of 2008","Difference in Freq (MHz)"}]
-ListPlot[distsfoF2[[2]],Joined->False,PlotLabel->"Nighttime foF2",FrameLabel->{"Day of 2008","Difference in Freq (MHz)"}]
-ListPlot[distsNmF2[[1]],Joined->False,PlotLabel->"Daytime NmF2",FrameLabel->{"Day of 2008","Difference in Density (cm^-3)"}]
-ListPlot[distsNmF2[[2]],Joined->False,PlotLabel->"Nighttime NmF2",FrameLabel->{"Day of 2008","Difference in Density (cm^-3)"}]
-*)
 ListPlot[distsNmF2per[[1]],Joined->False,PlotLabel->"Daytime NmF2",FrameLabel->{"Day of 2008","Difference in Density (%)"}]
 ListPlot[distsNmF2per[[2]],Joined->False,PlotLabel->"Nighttime NmF2",FrameLabel->{"Day of 2008","Difference in Density (%)"}]
 
